@@ -1,11 +1,5 @@
 import numpy as np
 
-class Gradient:
-    def __init__(self, alpha):
-        self.alpha = alpha
-        
-    def __call__(self, t, y):
-        return self.alpha * y
 
 def euler(y0, f, timesteps):
     # assume that we got more than one step, otherwise there will be no deltat
