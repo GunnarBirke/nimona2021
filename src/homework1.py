@@ -1,5 +1,5 @@
 import numpy as np
-import euler as euler
+import numode as numode
 import matplotlib.pyplot as plt
 
 class Gradient:
@@ -30,7 +30,7 @@ def part1():
     grad1 = Gradient(-1.0)
 
     t = np.arange(0, T + deltat, deltat)
-    y = euler.euler(y0, grad1, t)
+    y = numode.euler(y0, grad1, t)
     yscalars = y[:, 0]
     yexact = 0.5 * np.exp(-t)
     plotFunction(t, yscalars, yexact)
@@ -42,7 +42,7 @@ def part2():
     grad2 = Gradient2(-1.0)
 
     t = np.arange(0, T + deltat, deltat)
-    y = euler.euler(y0, grad2, t)
+    y = numode.euler(y0, grad2, t)
     yscalars = y[:, 0]
     yexact = np.sin(t)
     plotFunction(t, yscalars, yexact)
