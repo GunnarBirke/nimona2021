@@ -67,3 +67,10 @@ def plotPhases(y, t, N, positions, title=""):
     plt.title('Test')
     plt.show()
     
+def plotMap(positions):
+    fig, ax = plt.subplots()
+    c = np.zeros(positions.shape[0]) + 2
+    ax.set_aspect('equal', 'box')
+    
+    ax.scatter(positions[:, 0], positions[:, 1], c, cmap='hsv', vmin=0, vmax=2*np.pi)
+    plt.show()
