@@ -67,10 +67,99 @@ def plotPhases(y, t, N, positions, title=""):
     plt.title('Test')
     plt.show()
     
-def plotMap(positions):
+def distanceLineSegmentPoint(a, b, p):
+    ab = b - a
+    ap = p - a
+    bp = p - b
+    
+    e = np.dot(ap, ab)
+    
+    if e <= 0.0:
+        return np.dot(ap, ap)
+    
+    f = np.dot(ab, ab)
+    
+    if e >= f:
+        return np.dot(bp, bp)
+    
+    return np.dot(ap, ap) - e * e / f
+    
+def findClosestEdge(positions, adj, x, y):
+    minDist = 100000.0 # just pick a very large value and hope for the best
+    minI = -1
+    minJ = -1
+    
+    for i in range(0, positions.shape[0]):
+        for j in range(0, positions.shape[0]):
+            p1 = positions[i, :]
+            p2 = positions[j, :]
+            p = np.array([x, y])
+            d = distanceLineSegmentPoint(p1, p2, p)
+            
+            if d < minDist:
+                minDist = d
+                minI = i
+                minJ = j
+                
+    return (minI, minJ)
+
+def findClosestPoint(positions, x, y):
+    p = np.array([x, y])
+    minDist = 100000.0 # again, we hope..
+    pIndex = -1
+    
+    for i in range(0, positions.shape[0]):
+        d = np.dot(positions[i] - p, positions[i] - p)
+        
+        if d < minDist:
+            minDist = d
+            pIndex = i
+            
+    return pIndex
+    
+def drawMap(positions, adj, ax):
+    plt.scatter(positions[:, 0], positions[:, 1], c='r', s=0.3)
+    
+    for i in range(adj.shape[0]):
+        for j in range(adj.shape[1]):
+            if adj[i, j] != 0:
+                plt.plot(positions[[i,j], 0], positions[[i,j], 1], 'k-', zorder=0)
+
+firstPoint = -1
+
+def plotMap(positions, adj):
     fig, ax = plt.subplots()
     c = np.zeros(positions.shape[0]) + 2
     ax.set_aspect('equal', 'box')
     
-    ax.scatter(positions[:, 0], positions[:, 1], c, cmap='hsv', vmin=0, vmax=2*np.pi)
+    def onclick(event):
+        global firstPoint
+        x = event.xdata
+        y = event.ydata
+        
+        i = findClosestPoint(positions, x, y)
+        
+        if firstPoint == -1:
+            firstPoint = i
+        else:
+            if adj[firstPoint, i] == 0.0:
+                adj[firstPoint, i] = 50.0
+                adj[i, firstPoint] = adj[firstPoint, i]
+            else:
+                adj[firstPoint, i] = 0.0
+                adj[i, firstPoint] = adj[firstPoint, i]
+                
+            firstPoint = -1
+                
+        
+        plt.cla()
+        event.inaxes.set_aspect('equal', 'box')
+        plt.plot(x, y, 'k+')
+        drawMap(positions, adj, ax)
+        plt.draw()
+        
+        
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
+    
+    drawMap(positions, adj, ax)
     plt.show()

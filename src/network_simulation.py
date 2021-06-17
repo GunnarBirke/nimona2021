@@ -8,7 +8,7 @@ network = network_model.NetworkModel()
 positions = np.load('./networks/ukPos.npy')
 network.adj = 50 * np.load('./networks/ukAdj.npy')
 
-plot.plotMap(positions)
+plot.plotMap(positions, network.adj)
 
 network.freqs = np.random.normal(loc=0.2, scale=0.01, size=network.adj.shape[0])
 y0 = np.random.uniform(0.0, 2 * np.pi, network.adj.shape[0])
