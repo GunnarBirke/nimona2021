@@ -73,7 +73,7 @@ def plotPhases(y, t, N, positions, adj, title=""):
         return points, orderPointPatch, ret
 
     _ = animation.FuncAnimation(plt.gcf(), animate, t.shape[0], init_func=init,
-                                interval=500,
+                                interval=200,
                                 blit=True, repeat_delay=1000)
 
     plt.title('Test')
