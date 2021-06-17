@@ -2,6 +2,23 @@ import numpy as np
 import numode as numode
 import network_model as network_model
 import plotting as plot
+import sys
+import os
+
+if not os.path.isdir('./networks'):
+    os.mkdir('./networks')
+    
+if not os.path.isdir('./simulations'):
+    os.mkdir('./simulations')
+
+simulationDataFilename = sys.argv[1]
+newNetworkFilename = sys.argv[2]
+
+if not simulationDataFilename.endswith('.npy'):
+    simulationDataFilename += '.npy'
+    
+if not newNetworkFilename.endswith('.npy'):
+    newNetworkFilename += '.npy'
 
 network = network_model.NetworkModel()
 
@@ -18,8 +35,8 @@ T = 1.5
 t = np.arange(0, T + deltat, deltat)
 y = numode.runge_kutta(y0, network, t)
 
-with open('./networks/ukAdjUpdated.npy', 'wb') as f:
+with open('./networks/' + newNetworkFilename, 'wb') as f:
     np.save(f, network.adj)
 
-with open('./simulations/uk_random.npy', 'wb') as f:
+with open('./simulations/' + simulationDataFilename, 'wb') as f:
     np.save(f, y)
