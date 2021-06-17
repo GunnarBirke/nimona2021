@@ -18,5 +18,8 @@ T = 1.5
 t = np.arange(0, T + deltat, deltat)
 y = numode.runge_kutta(y0, network, t)
 
+with open('./networks/ukAdjUpdated.npy', 'wb') as f:
+    np.save(f, network.adj)
+
 with open('./simulations/uk_random.npy', 'wb') as f:
     np.save(f, y)

@@ -5,13 +5,14 @@ from matplotlib.patches import FancyArrow
 import numpy as np
 
 class AnimateFunctor:
-    def __init__(self, y, ax_circle, ax_map, positions, points, arrowPatch):
+    def __init__(self, y, ax_circle, ax_map, positions, points, adj, arrowPatch):
         self.arrowPatch = arrowPatch
         self.points = points
         self.y = y
         self.ax_circle = ax_circle
         self.ax_map = ax_map
         self.positions = positions
+        self.adj = adj
         
     def __call__(self, i):
         self.points.set_data(np.sin(self.y[i, :]), np.cos(self.y[i, :]))
@@ -28,10 +29,15 @@ class AnimateFunctor:
         
         self.ax_map.clear()
         ret = self.ax_map.scatter(self.positions[:, 0], self.positions[:, 1], c=self.y[i, :]%(2*np.pi), cmap='hsv', vmin=0, vmax=2*np.pi)
+        
+        for i in range(self.adj.shape[0]):
+            for j in range(self.adj.shape[1]):
+                if self.adj[i, j] != 0:
+                    self.ax_map.plot(self.positions[[i,j], 0], self.positions[[i,j], 1], 'k-', zorder=0)
     
         return self.points, self.arrowPatch, ret
 
-def plotPhases(y, t, N, positions, title=""):
+def plotPhases(y, t, N, positions, adj, title=""):
     fig = plt.figure(figsize=(14, 8))
     gs = gridspec.GridSpec(nrows=2, ncols=2, height_ratios=[4,1])
     ax_map = fig.add_subplot(gs[:, 0])
@@ -53,11 +59,17 @@ def plotPhases(y, t, N, positions, title=""):
     orderPoint = FancyArrow(0.0, 0.0, xCoord, yCoord, head_width = 0.05, color='orange', zorder=100.0, length_includes_head=True)
     orderPointPatch = ax_circle.add_patch(orderPoint)
     
-    animate = AnimateFunctor(y, ax_circle, ax_map, positions, points, orderPointPatch)
+    animate = AnimateFunctor(y, ax_circle, ax_map, positions, points, adj, orderPointPatch)
 
     def init():
         points.set_data(np.sin(y[0, :]), np.cos(y[0, :]))
         ret = ax_map.scatter(positions[:, 0], positions[:, 1], c=y[0, :]%(2*np.pi), cmap='hsv', vmin=0, vmax=2*np.pi)
+        
+        for i in range(adj.shape[0]):
+            for j in range(adj.shape[1]):
+                if adj[i, j] != 0:
+                    ax_map.plot(positions[[i,j], 0], positions[[i,j], 1], 'k-', zorder=0)
+                
         return points, orderPointPatch, ret
 
     _ = animation.FuncAnimation(plt.gcf(), animate, t.shape[0], init_func=init,
