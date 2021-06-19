@@ -3,15 +3,10 @@ import numode as numode
 import network_model as network_model
 import plotting as plot
 import sys
+import config as config
 
-simulationDataFilename = sys.argv[1]
-networkFilename = sys.argv[2]
-
-if not simulationDataFilename.endswith('.npy'):
-    simulationDataFilename += '.npy'
-    
-if not networkFilename.endswith('.npy'):
-    networkFilename += '.npy'
+simulationDataFilename = config.simulationDataFilename
+networkFilename = config.networkFilename
 
 network = network_model.NetworkModel()
 
