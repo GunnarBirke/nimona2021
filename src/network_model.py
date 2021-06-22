@@ -1,10 +1,9 @@
 import numpy as np
 
 class NetworkModel:
-    def __init__(self, config):
-        # pick some random initial data
-        self.adj = np.zeros((10, 10))
-        self.freqs = np.zeros((10))
+    def __init__(self, config, adj, freqs):
+        self.adj = adj
+        self.freqs = freqs
         
         self.config = config
         self.nextFailingEdgeAtTime = 0

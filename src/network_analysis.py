@@ -6,21 +6,20 @@ import sys
 import json as json
 
 config = None
+simulationTopDirectory = './simulations'
 
-with open("simulations/config1.json", 'r') as f:
+with open(simulationTopDirectory + '/config.json', 'r') as f:
     config = json.load(f)
 
-simulationDataFilename = config['simulationDataFilename']
-networkFilename = config['networkFilename']
-
-network = network_model.NetworkModel(config)
+simulationDataFilename = '/simulationData0.npy'
+networkFilename = '/network.npy'
 
 positions = np.load('./networks/ukPos.npy')
-network.adj = np.load('./networks/' + networkFilename)
+adj = np.load(simulationTopDirectory + networkFilename)
 
 deltat = config['deltat']
 T = config['T']
 t = np.arange(0, T + deltat, deltat)
-y = np.load('./simulations/' + simulationDataFilename)
+y = np.load(simulationTopDirectory + simulationDataFilename)
 
-plot.plotPhases(y, t, network.adj.shape[0], positions, network.adj, config)
+plot.plotPhases(y, t, adj.shape[0], positions, adj, config)
