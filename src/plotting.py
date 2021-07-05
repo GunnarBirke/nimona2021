@@ -5,7 +5,7 @@ from matplotlib.patches import FancyArrow
 import numpy as np
 
 class AnimateFunctor:
-    def __init__(self, y, ax_circle, ax_map, positions, points, adj, arrowPatch, config):
+    def __init__(self, y, ax_circle, ax_map, positions, points, adj, arrowPatch, config, start):
         self.arrowPatch = arrowPatch
         self.points = points
         self.y = y
@@ -17,8 +17,11 @@ class AnimateFunctor:
         self.config = config
         self.nextFailingEdgeAtTime = 0
         self.nextFailingEdgeAtSynchronization = 0
+        self.start = start
         
     def __call__(self, i):
+        i += self.start
+        
         while self.nextFailingEdgeAtTime < len(self.config['edgesFailingAtTime']) and self.config['edgesFailingAtTime'][self.nextFailingEdgeAtTime]['time'] <= self.t:
             self.adj[self.config['edgesFailingAtTime'][self.nextFailingEdgeAtTime]['node1'], self.config['edgesFailingAtTime'][self.nextFailingEdgeAtTime]['node2']] = 0.0
             self.adj[self.config['edgesFailingAtTime'][self.nextFailingEdgeAtTime]['node2'], self.config['edgesFailingAtTime'][self.nextFailingEdgeAtTime]['node1']] = 0.0
@@ -30,9 +33,6 @@ class AnimateFunctor:
             self.nextFailingEdgeAtSynchronization += 1
             
         self.points.set_data(np.sin(self.y[i, :]), np.cos(self.y[i, :]))
-        
-        if i % 100 == 0:
-            print(self.t)
     
         xCoord = np.sin(self.y[i, :]).sum()
         yCoord = np.cos(self.y[i, :]).sum()
@@ -58,7 +58,7 @@ class AnimateFunctor:
         
         return toUpdate
 
-def plotPhases(y, t, N, positions, adj, config, title=""):
+def plotPhases(y, t, N, positions, adj, config, start, title=""):
     fig = plt.figure(figsize=(14, 8))
     gs = gridspec.GridSpec(nrows=2, ncols=2, height_ratios=[4,1])
     ax_map = fig.add_subplot(gs[:, 0])
@@ -80,7 +80,7 @@ def plotPhases(y, t, N, positions, adj, config, title=""):
     orderPoint = FancyArrow(0.0, 0.0, xCoord, yCoord, head_width = 0.05, color='orange', zorder=100.0, length_includes_head=True)
     orderPointPatch = ax_circle.add_patch(orderPoint)
     
-    animate = AnimateFunctor(y, ax_circle, ax_map, positions, points, adj, orderPointPatch, config)
+    animate = AnimateFunctor(y, ax_circle, ax_map, positions, points, adj, orderPointPatch, config, start)
 
     def init():
         points.set_data(np.sin(y[0, :]), np.cos(y[0, :]))
@@ -93,8 +93,8 @@ def plotPhases(y, t, N, positions, adj, config, title=""):
                 
         return points, orderPointPatch, ret
 
-    _ = animation.FuncAnimation(plt.gcf(), animate, t.shape[0], init_func=init,
-                                interval=2,
+    _ = animation.FuncAnimation(plt.gcf(), animate, t.shape[0] - start, init_func=init,
+                                interval=10,
                                 blit=True, repeat_delay=1000)
 
     plt.title('Test')

@@ -22,4 +22,8 @@ T = config['T']
 t = np.arange(0, T + deltat, deltat)
 y = np.load(simulationTopDirectory + simulationDataFilename)
 
-plot.plotPhases(y, t, adj.shape[0], positions, adj, config)
+start = t.shape[0]
+start -= 100
+start = 0
+
+plot.plotPhases(y, t, adj.shape[0], positions, adj, config, start)
